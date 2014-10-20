@@ -13,21 +13,19 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Implements a dynamic service locator, (see
  * http://martinfowler.com/articles/injection.html#UsingAServiceLocator)
- * 
+ * <p/>
  * The intended use case is the following :
- *   1) Initialization
- *   ServiceLocator locator = new ServiceLocator();
- *   ConfigServiceImpl configServiceImpl = new ConfigServiceImpl();
- *   AgentEntity agentEntity = new AgentEntity();
- *   locator.loadService(ConfigService.class, configServiceImpl).loadService(Serializable.class, agentEntity);
- *   ServiceLocator.load(locator);
- *   
- *   2) Use of the service locator in the same class loader
- *   ConfigService value = ServiceLocator.locate(ConfigService.class);
- * 
+ * 1) Initialization
+ * ServiceLocator locator = new ServiceLocator();
+ * ConfigServiceImpl configServiceImpl = new ConfigServiceImpl();
+ * AgentEntity agentEntity = new AgentEntity();
+ * locator.loadService(ConfigService.class, configServiceImpl).loadService(Serializable.class, agentEntity);
+ * ServiceLocator.load(locator);
+ * <p/>
+ * 2) Use of the service locator in the same class loader
+ * ConfigService value = ServiceLocator.locate(ConfigService.class);
+ * <p/>
  * You can not load it more than once (unless you call unload()); you can not start locating before load() was called
- * 
- * 
  */
 public class ServiceLocator {
 
@@ -35,17 +33,11 @@ public class ServiceLocator {
 
   private final Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
 
-  public final <T> ServiceLocator loadService(Class<T> clazz, T implementation) {
-    services.put(clazz, implementation);
-    return this;
-  }
-
   public static <T> T locate(Class<T> typeToReturn) {
     Map<Class<?>, Object> m = installedServices.get();
     if (m == null) {
       throw new IllegalStateException("The service locator has not been initialized yet ! (through the load() method)");
-    }
-    else {
+    } else {
       return (T) m.get(typeToReturn);
     }
   }
@@ -60,6 +52,11 @@ public class ServiceLocator {
 
   public static void unload() {
     installedServices.set(null);
+  }
+
+  public final <T> ServiceLocator loadService(Class<T> clazz, T implementation) {
+    services.put(clazz, implementation);
+    return this;
   }
 }
 

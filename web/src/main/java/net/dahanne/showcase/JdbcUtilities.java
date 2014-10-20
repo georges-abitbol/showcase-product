@@ -16,12 +16,15 @@ public final class JdbcUtilities {
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcUtilities.class);
 
-  public static void cleanUpDB(String dbFileName) throws DataAccessException {
-    delete(new File(dbFileName+".mv.db"));
-    delete(new File(dbFileName+".trace.db"));
-
+  private JdbcUtilities() {
+    // not instantiable
   }
 
+  public static void cleanUpDB(String dbFileName) throws DataAccessException {
+    delete(new File(dbFileName + ".mv.db"));
+    delete(new File(dbFileName + ".trace.db"));
+
+  }
 
   public static void createTables(DataSource dataSource) throws DataAccessException {
     List<String> sqlStatements = loadSqlStatements("tables_create.sql");
@@ -89,17 +92,13 @@ public final class JdbcUtilities {
     return setup;
   }
 
-  private static void delete(File f)  {
+  private static void delete(File f) {
     if (f.isDirectory()) {
       for (File c : f.listFiles())
         delete(c);
     }
     if (!f.delete())
-      LOG.debug("Failed to delete file: " + f +" certainly because it does not exist yet");
-  }
-
-  private JdbcUtilities() {
-    // not instantiable
+      LOG.debug("Failed to delete file: " + f + " certainly because it does not exist yet");
   }
 
 }

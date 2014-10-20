@@ -1,4 +1,4 @@
-package net.dahanne.showcase.rest;
+package net.dahanne.showcase.resources;
 
 import net.dahanne.showcase.DataAccessException;
 import net.dahanne.showcase.ServiceLocator;
@@ -30,7 +30,7 @@ public class UserResource {
   @Path("{id}")
   @GET
   @Produces(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
-  public User getUser(@PathParam("id") long id ) {
+  public User getUser(@PathParam("id") long id) {
     return userService.getUser(id);
   }
 
@@ -44,7 +44,7 @@ public class UserResource {
   @PUT
   @Consumes(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
   @Produces(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
-  public User addSubscription(@PathParam("id") long id , User user) {
+  public User addSubscription(@PathParam("id") long id, User user) {
     return userService.createOrUpdateUser(id, user);
   }
 

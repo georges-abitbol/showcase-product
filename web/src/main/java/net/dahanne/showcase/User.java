@@ -7,12 +7,12 @@ public class User {
   private String name;
   private long id;
 
-  public User(){
+  public User() {
   }
 
   public User(long id, String name) {
-    this.id =  id;
-    this.name =  name;
+    this.id = id;
+    this.name = name;
   }
 
   public String getName() {

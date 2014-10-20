@@ -2,16 +2,18 @@ package net.dahanne.showcase;
 
 import javax.sql.DataSource;
 import javax.ws.rs.ProcessingException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by anthony on 2014-10-19.
- *
+ * <p/>
  * UserService implementation using SQL
- *
  */
 public class UserServiceImpl implements UserService {
 
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
           String name = rs.getString("name");
           long id = rs.getLong("id");
 
-          User user = new User(id,name);
+          User user = new User(id, name);
           users.add(user);
         }
       } catch (SQLException e) {
