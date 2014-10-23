@@ -1,5 +1,10 @@
 package net.dahanne.showcase;
 
+import net.dahanne.showcase.persistence.*;
+import net.dahanne.showcase.persistence.services.AccountService;
+import net.dahanne.showcase.persistence.services.UserService;
+import net.dahanne.showcase.persistence.services.impl.AccountServiceImpl;
+import net.dahanne.showcase.persistence.services.impl.UserServiceImpl;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.basic.DefaultOAuthConsumer;
 import oauth.signpost.signature.QueryStringSigningStrategy;
@@ -9,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 
 /**
  * Created by anthony on 2014-10-18.
@@ -38,23 +44,27 @@ public class EnvironmentLoaderListener implements ServletContextListener {
     source.setURL("jdbc:h2:./showcaseDatabase");
     source.setUser("sa");
     source.setPassword("sa");
-//    DataSource dataSource = new net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy(source);
+    DataSource dataSource = new net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy(source);
 
     try {
       JdbcUtilities.cleanUpDB("./showcaseDatabase");
-      JdbcUtilities.createTables(source);
-      JdbcUtilities.addSampleData(source);
+      JdbcUtilities.createTables(dataSource);
+      JdbcUtilities.addSampleData(dataSource);
     } catch (DataAccessException e) {
       LOG.error("There was an error initializing the database, the application can't continue....", e);
     }
 
     ServiceLocator locator = new ServiceLocator();
     UserService userServiceImpl = new UserServiceImpl(source);
+    AccountService accountServiceImpl = new AccountServiceImpl(source);
+
 
     OAuthConsumer consumer = new DefaultOAuthConsumer(consumerKey, consumerSecret);
     consumer.setSigningStrategy(new QueryStringSigningStrategy());
 
     locator.loadService(UserService.class, userServiceImpl);
+    locator.loadService(AccountService.class, accountServiceImpl);
+
     locator.loadService(OAuthConsumer.class, consumer);
 
     ServiceLocator.load(locator);

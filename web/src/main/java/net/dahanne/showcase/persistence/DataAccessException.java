@@ -1,4 +1,4 @@
-package net.dahanne.showcase;
+package net.dahanne.showcase.persistence;
 
 /**
  * Created by anthony on 2014-10-19.

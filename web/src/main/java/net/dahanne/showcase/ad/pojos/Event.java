@@ -1,6 +1,8 @@
-package net.dahanne.showcase.pojos;
+package net.dahanne.showcase.ad.pojos;
 
-import net.dahanne.showcase.enums.*;
+import net.dahanne.showcase.ad.enums.Flag;
+import net.dahanne.showcase.ad.enums.Type;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 

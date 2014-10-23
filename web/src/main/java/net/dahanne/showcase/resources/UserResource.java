@@ -1,9 +1,9 @@
 package net.dahanne.showcase.resources;
 
-import net.dahanne.showcase.DataAccessException;
+import net.dahanne.showcase.persistence.DataAccessException;
 import net.dahanne.showcase.ServiceLocator;
-import net.dahanne.showcase.User;
-import net.dahanne.showcase.UserService;
+import net.dahanne.showcase.persistence.pojos.User;
+import net.dahanne.showcase.persistence.services.UserService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -27,11 +27,11 @@ public class UserResource {
     return userService.getAllUsers();
   }
 
-  @Path("{id}")
+  @Path("{uuid}")
   @GET
   @Produces(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
-  public User getUser(@PathParam("id") long id) {
-    return userService.getUser(id);
+  public User getUser(@PathParam("uuid") String uuid) throws DataAccessException {
+    return userService.getUserByUuid(uuid);
   }
 
   @POST

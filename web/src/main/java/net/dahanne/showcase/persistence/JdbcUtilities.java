@@ -1,4 +1,4 @@
-package net.dahanne.showcase;
+package net.dahanne.showcase.persistence;
 
 
 import org.slf4j.Logger;

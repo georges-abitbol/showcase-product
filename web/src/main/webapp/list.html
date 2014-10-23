@@ -1,0 +1,46 @@
+<!--Search: <input ng-model="query">Sort by:-->
+<select ng-model="orderProp">
+    <option value="email">By email</option>
+    <option value="id">By id</option>
+</select>
+
+
+<ul>
+    <li ng-repeat="account in accounts">
+        <p>Account id : {{account.id}} , uuid : {{account.uuid}}, name : {{account.name}}, editionCode : {{account.editionCode}}, maxUsers : {{account.editionCode}}, appDirectManaged : {{account.editionCode}}, appDirectBaseUrl : {{account.appDirectBaseUrl}} </p>
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>UUID</th>
+                <th>OpenId</th>
+                <th>email</th>
+                <th>firstName</th>
+                <th>lastName</th>
+                <th>zipCode</th>
+                <th>department</th>
+                <th>timezone</th>
+                <th>admin</th>
+                <!--<th><a href="#/new"><i class="icon-plus-sign"></i></a></th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="user in account.users | filter:search | orderBy:orderProp">
+                <td>{{user.id}}</td>
+                <td>{{user.uuid}}</td>
+                <td>{{user.openId}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.firstName}}</td>
+                <td>{{user.lastName}}</td>
+                <td>{{user.zipCode}}</td>
+                <td>{{user.department}}</td>
+                <td>{{user.timezone}}</td>
+                <td>{{user.admin}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </li>
+</ul>
+
+
+

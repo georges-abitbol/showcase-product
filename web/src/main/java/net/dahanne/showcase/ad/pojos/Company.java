@@ -1,4 +1,4 @@
-package net.dahanne.showcase.pojos;
+package net.dahanne.showcase.ad.pojos;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

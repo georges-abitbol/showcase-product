@@ -1,4 +1,7 @@
-package net.dahanne.showcase;
+package net.dahanne.showcase.persistence.services;
+
+import net.dahanne.showcase.persistence.DataAccessException;
+import net.dahanne.showcase.persistence.pojos.User;
 
 import java.util.Collection;
 
@@ -16,5 +19,5 @@ public interface UserService {
 
   void deleteUser(long id);
 
-  User getUser(long id);
+  User getUserByUuid(String uuid) throws DataAccessException;
 }

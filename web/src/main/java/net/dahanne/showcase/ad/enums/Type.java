@@ -1,4 +1,4 @@
-package net.dahanne.showcase.enums;
+package net.dahanne.showcase.ad.enums;
 
 public enum Type {
   SUBSCRIPTION_ORDER,
