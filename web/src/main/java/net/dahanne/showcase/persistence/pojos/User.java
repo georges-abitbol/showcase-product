@@ -4,7 +4,6 @@ package net.dahanne.showcase.persistence.pojos;
  * Created by anthony on 2014-10-19.
  */
 public class User {
-  private long id;
   private String uuid;
   private String openId;
   private String email;
@@ -19,8 +18,7 @@ public class User {
   public User() {
   }
 
-  public User(long id, String uuid, String openId, String email, String firstName, String lastName, String zipCode, String department, String timezone, boolean admin) {
-    this.id = id;
+  public User(String uuid, String openId, String email, String firstName, String lastName, String zipCode, String department, String timezone, boolean admin) {
     this.uuid = uuid;
     this.openId = openId;
     this.email = email;
@@ -30,14 +28,6 @@ public class User {
     this.department = department;
     this.timezone = timezone;
     this.admin = admin;
-  }
-
-  public long getId() {
-    return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
   }
 
   public String getUuid() {
@@ -127,26 +117,37 @@ public class User {
 
     User user = (User) o;
 
-    if (id != user.id) return false;
-    if (!openId.equals(user.openId)) return false;
+    if (admin != user.admin) return false;
+    if (department != null ? !department.equals(user.department) : user.department != null) return false;
+    if (email != null ? !email.equals(user.email) : user.email != null) return false;
+    if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
+    if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
+    if (openId != null ? !openId.equals(user.openId) : user.openId != null) return false;
+    if (timezone != null ? !timezone.equals(user.timezone) : user.timezone != null) return false;
     if (!uuid.equals(user.uuid)) return false;
+    if (zipCode != null ? !zipCode.equals(user.zipCode) : user.zipCode != null) return false;
 
     return true;
   }
 
   @Override
   public int hashCode() {
-    int result = (int) (id ^ (id >>> 32));
-    result = 31 * result + uuid.hashCode();
-    result = 31 * result + openId.hashCode();
+    int result = uuid.hashCode();
+    result = 31 * result + (openId != null ? openId.hashCode() : 0);
+    result = 31 * result + (email != null ? email.hashCode() : 0);
+    result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+    result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+    result = 31 * result + (zipCode != null ? zipCode.hashCode() : 0);
+    result = 31 * result + (department != null ? department.hashCode() : 0);
+    result = 31 * result + (timezone != null ? timezone.hashCode() : 0);
+    result = 31 * result + (admin ? 1 : 0);
     return result;
   }
 
   @Override
   public String toString() {
     return "User{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
+        "uuid='" + uuid + '\'' +
         ", openId='" + openId + '\'' +
         ", email='" + email + '\'' +
         ", firstName='" + firstName + '\'' +
@@ -155,6 +156,7 @@ public class User {
         ", department='" + department + '\'' +
         ", timezone='" + timezone + '\'' +
         ", admin=" + admin +
+        ", account=" + account +
         '}';
   }
 }

@@ -51,7 +51,7 @@ public class UserResource {
   @DELETE
   @Consumes(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
   @Produces(MediaType.APPLICATION_JSON + ";charset=" + "UTF-8")
-  public void deleteUser(@PathParam("id") long id) {
-    userService.deleteUser(id);
+  public void deleteUser(@PathParam("id") String uuid) throws DataAccessException {
+    userService.deleteUser(uuid);
   }
 }

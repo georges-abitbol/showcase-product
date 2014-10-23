@@ -20,10 +20,9 @@ public final class JdbcUtilities {
     // not instantiable
   }
 
-  public static void cleanUpDB(String dbFileName) throws DataAccessException {
+  public static void cleanUpDB(String dbFileName){
     delete(new File(dbFileName + ".mv.db"));
     delete(new File(dbFileName + ".trace.db"));
-
   }
 
   public static void createTables(DataSource dataSource) throws DataAccessException {

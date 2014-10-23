@@ -1,8 +1,7 @@
 package net.dahanne.showcase.persistence.services.impl;
 
-import net.dahanne.showcase.NotImplementedException;
-import net.dahanne.showcase.persistence.pojos.Account;
 import net.dahanne.showcase.persistence.DataAccessException;
+import net.dahanne.showcase.persistence.pojos.Account;
 import net.dahanne.showcase.persistence.pojos.User;
 import net.dahanne.showcase.persistence.services.AccountService;
 
@@ -12,13 +11,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by anthony on 2014-10-19.
- * <p/>
  * AccountService implementation using SQL
  */
 public class AccountServiceImpl implements AccountService {
@@ -30,7 +26,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public void createAccount(Account account) throws DataAccessException {
+  public void createAccountAndAssociatedUsers(Account account) throws DataAccessException {
     try (Connection connection = dataSource.getConnection()) {
 
       connection.setAutoCommit(false);
@@ -51,18 +47,18 @@ public class AccountServiceImpl implements AccountService {
 
       // and then the associated users
       for (User user : account.getUsers()) {
-        String userInsertQuery = "insert into users(id, uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin) VALUES(?,?,?,?,?,?,?,?,?,?)";
+        String userInsertQuery = "insert into users(uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin, accountUuid) VALUES(?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(userInsertQuery)) {
-          preparedStatement.setLong(1, user.getId());
-          preparedStatement.setString(2, user.getUuid());
-          preparedStatement.setString(3, user.getOpenId());
-          preparedStatement.setString(4, user.getEmail());
-          preparedStatement.setString(5, user.getFirstName());
-          preparedStatement.setString(6, user.getLastName());
-          preparedStatement.setString(7, user.getZipCode());
-          preparedStatement.setString(8, user.getDepartment());
-          preparedStatement.setString(9, user.getTimezone());
-          preparedStatement.setBoolean(10, user.isAdmin());
+          preparedStatement.setString(1, user.getUuid());
+          preparedStatement.setString(2, user.getOpenId());
+          preparedStatement.setString(3, user.getEmail());
+          preparedStatement.setString(4, user.getFirstName());
+          preparedStatement.setString(5, user.getLastName());
+          preparedStatement.setString(6, user.getZipCode());
+          preparedStatement.setString(7, user.getDepartment());
+          preparedStatement.setString(8, user.getTimezone());
+          preparedStatement.setBoolean(9, user.isAdmin());
+          preparedStatement.setString(10, account.getUuid());
           preparedStatement.executeUpdate();
         } catch (SQLException e) {
           throw new DataAccessException(e);
@@ -77,8 +73,30 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Account createOrUpdateAccount(long id, Account account) {
-    throw new NotImplementedException();
+  public void update(Account account) throws DataAccessException {
+    try (Connection connection = dataSource.getConnection()) {
+
+      connection.setAutoCommit(false);
+
+      // we first insert the account
+      String accountInsertQuery = "update accounts  set name = ?,  editionCode = ?, maxUsers = ?,  appDirectManaged = ?, appDirectBaseUrl = ? where uuid = ? ";
+      try (PreparedStatement preparedStatement = connection.prepareStatement(accountInsertQuery)) {
+        preparedStatement.setString(1, account.getName());
+        preparedStatement.setString(2, account.getEditionCode());
+        preparedStatement.setInt(3, account.getMaxUsers());
+        preparedStatement.setBoolean(4, account.isAppDirectManaged());
+        preparedStatement.setString(5, account.getAppDirectBaseUrl());
+        preparedStatement.setString(6, account.getUuid());
+        preparedStatement.executeUpdate();
+      } catch (SQLException e) {
+        throw new DataAccessException(e);
+      }
+
+      connection.commit();
+
+    } catch (SQLException e1) {
+      throw new ProcessingException(e1);
+    }
   }
 
   @Override
@@ -86,32 +104,30 @@ public class AccountServiceImpl implements AccountService {
     List<Account> accounts = new ArrayList();
     try (Connection connection = dataSource.getConnection()) {
 
-      String query = "SELECT * " +
-          "from accounts, users " +
-          "where accounts.id = users.accountId";
+      String query = "SELECT accountUuid,name, editionCode, appDirectBaseUrl, maxUsers,appDirectManaged, u.uuid as userUuid, openId, email, firstName, lastName, zipCode, department,timezone, admin   " +
+          "from accounts a, users u " +
+          "where a.uuid = u.accountUuid";
 
       try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
         ResultSet rs = preparedStatement.executeQuery();
-        long id = 0;
+        String uuid = null;
         List<User> users = null;
         while (rs.next()) {
-          long accountId = rs.getLong("accounts.id");
-          if (accountId != id) {
+          String accountUuid = rs.getString("accountUuid");
+          if (!accountUuid.equals(uuid)) {
             // create the account
             users = new ArrayList<>();
-            String accountsUuid = rs.getString("accounts.uuid");
             String name = rs.getString("name");
             String editionCode = rs.getString("editionCode");
             String appDirectBaseUrl = rs.getString("appDirectBaseUrl");
             int maxUsers = rs.getInt("maxUsers");
             boolean appDirectManaged = rs.getBoolean("appDirectManaged");
-            Account account = new Account(id, accountsUuid, name, users, editionCode, maxUsers, appDirectManaged, appDirectBaseUrl);
+            Account account = new Account(accountUuid, name, users, editionCode, maxUsers, appDirectManaged, appDirectBaseUrl);
             accounts.add(account);
-            id = accountId;
+            uuid = accountUuid;
           }
-          long userId = rs.getLong("users.id");
-          String userUuid = rs.getString("users.uuid");
+          String userUuid = rs.getString("userUuid");
           String openId = rs.getString("openId");
           String email = rs.getString("email");
           String firstName = rs.getString("firstName");
@@ -120,7 +136,7 @@ public class AccountServiceImpl implements AccountService {
           String department = rs.getString("department");
           String timezone = rs.getString("timezone");
           boolean admin = rs.getBoolean("admin");
-          User user = new User(userId, userUuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
+          User user = new User(userUuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
           users.add(user);
 
         }
@@ -135,42 +151,55 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public void deleteAccount(long id) {
+  public void deleteAccountAndAssociatedUsers(String uuid) throws DataAccessException {
+    try (Connection connection = dataSource.getConnection()) {
+      String query = "delete from accounts a where a.uuid = ? ";
+      connection.setAutoCommit(false);
+      try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
+        preparedStatement.setString(1, uuid);
+        preparedStatement.executeUpdate();
+
+      } catch (SQLException e) {
+        throw new DataAccessException(e);
+      }
+
+      connection.commit();
+
+
+    } catch (SQLException e1) {
+      throw new DataAccessException(e1);
+    }
   }
 
   @Override
-  public Account getAccount(long id) throws DataAccessException {
+  public Account getAccount(String uuid) throws DataAccessException {
     Account account = null;
-//    try (Connection connection = dataSource.getConnection()) {
-//
-//      String query = "SELECT id, uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin from accounts u where id = ?";
-//
-//      try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-//
-//        preparedStatement.setLong(1, id);
-//        ResultSet rs = preparedStatement.executeQuery();
-//
-//        while (rs.next()) {
-//          String uuid = rs.getString("uuid");
-//          String openId = rs.getString("openId");
-//          String email = rs.getString("email");
-//          String firstName = rs.getString("firstName");
-//          String lastName = rs.getString("lastName");
-//          String zipCode = rs.getString("zipCode");
-//          String department = rs.getString("department");
-//          String timezone = rs.getString("timezone");
-//          boolean admin = rs.getBoolean("admin");
-//
-//          account = new Account(id, uuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
-//        }
-//      } catch (SQLException e) {
-//        throw new DataAccessException(e);
-//      }
-//
-//    } catch (SQLException e1) {
-//      throw new DataAccessException(e1);
-//    }
+    try (Connection connection = dataSource.getConnection()) {
+
+      String query = "SELECT * from accounts u where uuid = ?";
+
+      try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+        preparedStatement.setString(1, uuid);
+        ResultSet rs = preparedStatement.executeQuery();
+
+        while (rs.next()) {
+          String accountsUuid = rs.getString("uuid");
+          String name = rs.getString("name");
+          String editionCode = rs.getString("editionCode");
+          String appDirectBaseUrl = rs.getString("appDirectBaseUrl");
+          int maxUsers = rs.getInt("maxUsers");
+          boolean appDirectManaged = rs.getBoolean("appDirectManaged");
+          account = new Account(accountsUuid, name, null, editionCode, maxUsers, appDirectManaged, appDirectBaseUrl);
+        }
+      } catch (SQLException e) {
+        throw new DataAccessException(e);
+      }
+
+    } catch (SQLException e1) {
+      throw new DataAccessException(e1);
+    }
     return account;
   }
 }

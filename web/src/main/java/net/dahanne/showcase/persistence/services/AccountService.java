@@ -11,11 +11,11 @@ import java.util.Collection;
 public interface AccountService {
   Collection<Account> getAllAccounts() throws DataAccessException;
 
-  Account getAccount(long id) throws DataAccessException;
+  Account getAccount(String uuid) throws DataAccessException;
 
-  void createAccount(Account account) throws DataAccessException;
+  void createAccountAndAssociatedUsers(Account account) throws DataAccessException;
 
-  Account createOrUpdateAccount(long id, Account account);
+  void update(Account account) throws DataAccessException;
 
-  void deleteAccount(long id);
+  void deleteAccountAndAssociatedUsers(String uuid) throws DataAccessException;
 }

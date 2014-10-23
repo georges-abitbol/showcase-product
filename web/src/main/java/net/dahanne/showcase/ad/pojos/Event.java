@@ -1,6 +1,5 @@
 package net.dahanne.showcase.ad.pojos;
 
-import net.dahanne.showcase.ad.enums.Flag;
 import net.dahanne.showcase.ad.enums.Type;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -12,7 +11,6 @@ public class Event {
   private Type type;
   private Marketplace marketplace;
   private String applicationUuid;
-  private Flag flag;
   private UserInfo creator;
   private Payload payload;
   private String returnUrl;
@@ -41,14 +39,6 @@ public class Event {
     this.applicationUuid = applicationUuid;
   }
 
-  @XmlElement(name = "flag")
-  public Flag getFlag() {
-    return flag;
-  }
-
-  public void setFlag(Flag flag) {
-    this.flag = flag;
-  }
 
   @XmlElement(name = "creator")
   public UserInfo getCreator() {
@@ -79,11 +69,10 @@ public class Event {
 
   @Override
   public String toString() {
-    return "EventInfo{" +
+    return "Event{" +
         "type=" + type +
         ", marketplace=" + marketplace +
         ", applicationUuid='" + applicationUuid + '\'' +
-        ", flag=" + flag +
         ", creator=" + creator +
         ", payload=" + payload +
         ", returnUrl='" + returnUrl + '\'' +

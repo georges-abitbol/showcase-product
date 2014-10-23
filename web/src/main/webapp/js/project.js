@@ -31,7 +31,7 @@ angular.module('showcaseApp',[
       $scope.accounts = data;
     });
 
-    $scope.orderProp = 'id';
+    $scope.orderProp = 'uuid';
   });
 
 

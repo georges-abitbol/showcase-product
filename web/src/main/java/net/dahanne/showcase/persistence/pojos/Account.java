@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Account {
 
-  private long id;
   private String uuid;
   private String name;
   private List<User> users = new ArrayList<User>();
@@ -17,8 +16,7 @@ public class Account {
   public Account() {
   }
 
-  public Account(long id, String uuid, String name, List<User> users, String editionCode, int maxUsers, boolean appDirectManaged, String appDirectBaseUrl) {
-    this.id = id;
+  public Account(String uuid, String name, List<User> users, String editionCode, int maxUsers, boolean appDirectManaged, String appDirectBaseUrl) {
     this.uuid = uuid;
     this.name = name;
     this.users = users;
@@ -28,14 +26,6 @@ public class Account {
     this.appDirectBaseUrl = appDirectBaseUrl;
   }
 
-
-  public long getId() {
-    return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
 
   public String getUuid() {
     return uuid;
@@ -101,13 +91,11 @@ public class Account {
     Account account = (Account) o;
 
     if (appDirectManaged != account.appDirectManaged) return false;
-    if (id != account.id) return false;
     if (maxUsers != account.maxUsers) return false;
     if (appDirectBaseUrl != null ? !appDirectBaseUrl.equals(account.appDirectBaseUrl) : account.appDirectBaseUrl != null)
       return false;
     if (editionCode != null ? !editionCode.equals(account.editionCode) : account.editionCode != null) return false;
     if (!name.equals(account.name)) return false;
-    if (users != null ? !users.equals(account.users) : account.users != null) return false;
     if (!uuid.equals(account.uuid)) return false;
 
     return true;
@@ -115,10 +103,8 @@ public class Account {
 
   @Override
   public int hashCode() {
-    int result = (int) (id ^ (id >>> 32));
-    result = 31 * result + uuid.hashCode();
+    int result = uuid.hashCode();
     result = 31 * result + name.hashCode();
-    result = 31 * result + (users != null ? users.hashCode() : 0);
     result = 31 * result + (editionCode != null ? editionCode.hashCode() : 0);
     result = 31 * result + maxUsers;
     result = 31 * result + (appDirectManaged ? 1 : 0);
@@ -126,11 +112,11 @@ public class Account {
     return result;
   }
 
+
   @Override
   public String toString() {
     return "Account{" +
-        "id=" + id +
-        ", uuid='" + uuid + '\'' +
+        "uuid='" + uuid + '\'' +
         ", name='" + name + '\'' +
         ", users=" + users +
         ", editionCode='" + editionCode + '\'' +

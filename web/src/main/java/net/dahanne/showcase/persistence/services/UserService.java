@@ -17,7 +17,7 @@ public interface UserService {
 
   Collection<User> getAllUsers() throws DataAccessException;
 
-  void deleteUser(long id);
+  void deleteUser(String uuid) throws DataAccessException;
 
   User getUserByUuid(String uuid) throws DataAccessException;
 }

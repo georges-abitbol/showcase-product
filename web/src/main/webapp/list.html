@@ -1,17 +1,23 @@
 <!--Search: <input ng-model="query">Sort by:-->
-<select ng-model="orderProp">
-    <option value="email">By email</option>
-    <option value="id">By id</option>
-</select>
+<!--<select ng-model="orderProp">-->
+    <!--<option value="email">By email</option>-->
+    <!--<option value="uuid">By uuid</option>-->
+<!--</select>-->
 
 
 <ul>
     <li ng-repeat="account in accounts">
-        <p>Account id : {{account.id}} , uuid : {{account.uuid}}, name : {{account.name}}, editionCode : {{account.editionCode}}, maxUsers : {{account.editionCode}}, appDirectManaged : {{account.editionCode}}, appDirectBaseUrl : {{account.appDirectBaseUrl}} </p>
-        <table>
+        <h2>Account : {{account.name}}</h2>
+        <ul>
+            <li>uuid : <b>{{account.uuid}}</b></li>
+            <li>editionCode : <b>{{account.editionCode}}</b></li>
+            <li>maxUsers : <b>{{account.maxUsers}}</b></li>
+            <li>appDirectManaged : <b>{{account.appDirectManaged}}</b></li>
+            <li>appDirectBaseUrl : <b><a href="{{account.appDirectBaseUrl}}">{{account.appDirectBaseUrl}}</a></b></li>
+        </ul>
+        <table class="table">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>UUID</th>
                 <th>OpenId</th>
                 <th>email</th>
@@ -26,7 +32,6 @@
             </thead>
             <tbody>
             <tr ng-repeat="user in account.users | filter:search | orderBy:orderProp">
-                <td>{{user.id}}</td>
                 <td>{{user.uuid}}</td>
                 <td>{{user.openId}}</td>
                 <td>{{user.email}}</td>

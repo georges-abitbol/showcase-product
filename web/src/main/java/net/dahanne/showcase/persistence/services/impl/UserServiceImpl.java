@@ -1,8 +1,7 @@
 package net.dahanne.showcase.persistence.services.impl;
 
-import net.dahanne.showcase.NotImplementedException;
-import net.dahanne.showcase.persistence.pojos.Account;
 import net.dahanne.showcase.persistence.DataAccessException;
+import net.dahanne.showcase.persistence.pojos.Account;
 import net.dahanne.showcase.persistence.pojos.User;
 import net.dahanne.showcase.persistence.services.UserService;
 
@@ -31,9 +30,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void createUser(User user) throws DataAccessException {
+    if(user.getAccount()==null) {
+      throw new DataAccessException("We can't create a user not attached to an account");
+    }
     try (Connection connection = dataSource.getConnection()) {
 
-      String updateQuery = "insert into users(uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin) VALUES(?,?,?,?,?,?,?,?,?,?)";
+      String updateQuery = "insert into users(uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin, accountUuid) VALUES(?,?,?,?,?,?,?,?,?,?)";
 
       try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
         connection.setAutoCommit(false);
@@ -46,6 +48,7 @@ public class UserServiceImpl implements UserService {
         preparedStatement.setString(7, user.getDepartment());
         preparedStatement.setString(8, user.getTimezone());
         preparedStatement.setBoolean(9, user.isAdmin());
+        preparedStatement.setString(10, user.getAccount().getUuid());
         preparedStatement.executeUpdate();
       } catch (SQLException e) {
         throw new DataAccessException(e);
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User createOrUpdateUser(long id, User user) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -68,14 +71,13 @@ public class UserServiceImpl implements UserService {
     List<User> users = new ArrayList();
     try (Connection connection = dataSource.getConnection()) {
 
-      String query = "SELECT id, uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin from users u";
+      String query = "SELECT uuid,  openId,  email,  firstName,  lastName,  zipCode,  department,  timezone, admin from users u";
 
       try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
         ResultSet rs = preparedStatement.executeQuery();
 
         while (rs.next()) {
-          long id = rs.getLong("id");
           String uuid = rs.getString("uuid");
           String openId = rs.getString("openId");
           String email = rs.getString("email");
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
           String timezone = rs.getString("timezone");
           boolean admin = rs.getBoolean("admin");
 
-          User user = new User(id, uuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
+          User user = new User(uuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
           users.add(user);
         }
       } catch (SQLException e) {
@@ -100,8 +102,24 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void deleteUser(long id) {
+  public void deleteUser(String uuid) throws DataAccessException {
 
+    try (Connection connection = dataSource.getConnection()) {
+
+      String query = "delete from users where uuid = ?";
+      connection.setAutoCommit(false);
+      try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+        preparedStatement.setString(1, uuid);
+        preparedStatement.executeUpdate();
+
+      } catch (SQLException e) {
+        throw new DataAccessException(e);
+      }
+      connection.commit();
+    } catch (SQLException e1) {
+      throw new DataAccessException(e1);
+    }
   }
 
   @Override
@@ -109,7 +127,7 @@ public class UserServiceImpl implements UserService {
     User user = null;
     try (Connection connection = dataSource.getConnection()) {
 
-      String query = "SELECT * from users u, accounts a where uuid = ? and accounts.id = users.accountId ";
+      String query = "SELECT * from users u, accounts a where u.uuid = ? and a.uuid = u.accountUuid ";
 
       try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
@@ -117,7 +135,6 @@ public class UserServiceImpl implements UserService {
         ResultSet rs = preparedStatement.executeQuery();
 
         while (rs.next()) {
-          long userId = rs.getLong("users.id");
           String openId = rs.getString("openId");
           String email = rs.getString("email");
           String firstName = rs.getString("firstName");
@@ -127,15 +144,14 @@ public class UserServiceImpl implements UserService {
           String timezone = rs.getString("timezone");
           boolean admin = rs.getBoolean("admin");
 
-          user = new User(userId, uuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
+          user = new User(uuid, openId, email, firstName, lastName, zipCode, department, timezone, admin);
           String accountsUuid = rs.getString("accounts.uuid");
-          long accountId = rs.getLong("accounts.id");
           String name = rs.getString("name");
           String editionCode = rs.getString("editionCode");
           String appDirectBaseUrl = rs.getString("appDirectBaseUrl");
           int maxUsers = rs.getInt("maxUsers");
           boolean appDirectManaged = rs.getBoolean("appDirectManaged");
-          Account account = new Account(accountId, accountsUuid, name, null, editionCode, maxUsers, appDirectManaged, appDirectBaseUrl);
+          Account account = new Account(accountsUuid, name, null, editionCode, maxUsers, appDirectManaged, appDirectBaseUrl);
           user.setAccount(account);
         }
       } catch (SQLException e) {

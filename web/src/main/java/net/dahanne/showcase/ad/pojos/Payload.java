@@ -8,6 +8,7 @@ public class Payload {
 
   private final HashMap<String, String> configuration = new HashMap<String, String>();
   private UserInfo user;
+  private AccountInfo account;
   private Company company;
   private Order order;
 
@@ -39,13 +40,22 @@ public class Payload {
     return configuration;
   }
 
+  public AccountInfo getAccount() {
+    return account;
+  }
+
+  public void setAccount(AccountInfo account) {
+    this.account = account;
+  }
+
   @Override
   public String toString() {
-    return "EventPayload{" +
-        "user=" + user +
+    return "Payload{" +
+        "configuration=" + configuration +
+        ", user=" + user +
+        ", account=" + account +
         ", company=" + company +
         ", order=" + order +
-        ", configuration=" + configuration +
         '}';
   }
 }
